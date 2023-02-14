@@ -1,0 +1,19 @@
+---
+title: "a1_Art_Kristin"
+author: "K.H.Art"
+date: "2023-02-14"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#### ESM 262 Assignment 1
+
+**Introduction**
+
+I am interested in gaining more practice programming with environmental data. I thought the course topics for ESM 262 looked interesting and really helpful for developing some best practices in my every-day analyses. For instance, I've never incorporated modularity into my scripts and would like to become familiar with how to set that up. I hope to continue using Rstudio to perform statistical analyses and visualizations of energy- and emissions-related data during an internship this summer as well as after I complete the MESM program in 2024. 
+
+**Data Science Background**
+
+I worked as an environmental analyst at the San Francisco Estuary Institute between January 2020 - August 2022. During my time there, I learned how to use Python in the Spyder IDE. Part of my job responsibilities inluded QA/QC of high-frequency water quality monitoring data (through already created scripts) and statistical analysis and visualization of environmental monitoring data (by creating my own scripts). I had a great supervisor who was patient in teaching me Python and I learned a lot through that experience (although it was rather haphazard). I also took a graduate course on statistical analysis in R for biological applications during the last semester of my undergraduate degree (December 2019), but did not really understand much through that course. I learned R and Rstudio just last fall by taking ESM 206 and am currently enrolled in ESM 244. I enjoy coding and feel that I have a good foundation for data science despite being very new to it. I'm looking forward to the topics we'll cover in this course and to building more best practices!
