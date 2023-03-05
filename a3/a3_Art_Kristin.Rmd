@@ -1,0 +1,167 @@
+---
+title: "Automobile Power Generation"
+author: "K.H.Art"
+date: "2023-02-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(ggplot2)
+library(tidyverse)
+library(purrr)
+library(cowplot)
+library(wesanderson)
+```
+
+# Define a function to calculate car power and create a df with the car characteristics data
+```{r}
+#define function to calculate car power at given mass, surface area, and speed. Can also use source()
+compute_car_power = function(V, m, A, g = 9.8, p_air = 1.2, crolling = 0.015, cdrag =  0.3){
+  power_b = V * m * g * crolling + 0.5 * A * p_air * cdrag * V^3
+  return(power_b)
+}
+
+#create df with cars data
+cars_df <- data.frame(
+  name = c('A', 'B', 'C', 'D'),
+  mass = c(10000, 65000, 38000, 5000),
+  area = c(22, 30, 22, 10))
+
+```
+
+# Use a for loop to calculate the car powers at various speeds and find the mean and max values
+```{r}
+#create a sample of various speeds whose average is 80 km/hr with stdev 10 km/hr out of a total of 200 samples
+mean_speed = 80 * 0.277
+nsample = 200
+#create normal distribution sample using the above definitions
+speeds = rnorm(mean=mean_speed, 
+                sd=0.125*mean_speed, 
+                nsample)
+summary(speeds)
+
+#######################################################################################################
+
+#compute car powers, mean, and max using for loop
+#create empty df for all power values
+powers1 <- as.data.frame(matrix(nrow=length(speeds),ncol=nrow(cars_df))) 
+
+#create empty df for all summary values of interest
+powers1_summary <- data.frame(car = 1:nrow(cars_df), mean = numeric(nrow(cars_df)), max = numeric(nrow(cars_df))) 
+
+for (i in 1:nrow(cars_df)) {
+  #calculate car power for each row of the cars df based on speeds and add to powers1 df 
+  powers1[,i] = compute_car_power(A=cars_df$area[i],
+                                  m=cars_df$mass[i], 
+                                  V=speeds)
+  #take the mean of each car's powers and add those values to the summary df's mean column 
+  #powers1_summary$mean[i] = mean(powers1[,i]) #using the mean() fxn
+  powers1_summary$mean[i] = sum(powers1[,i])/length(speeds) #manually, using the sum() fxn
+  
+  #take the max of each car's powers and add those values to the summary df's max column 
+  #powers1_summary$max[i] = max(powers1[,i]) #using the map() fxn or manually, using a for loop (below)
+  
+  #set the first power as the max value 
+  max_power <- powers1[1,i]
+  #go through power values one by one and replace the max power if it is greater than the previous one
+  for (j in 2:length(powers1[,i])) {
+    if (powers1[j,i] > max_power) {
+      max_power <- powers1[j,i]
+    }
+  }
+  #add the final max power value to the summary df's max column 
+  powers1_summary$max[i] = max_power
+    
+  }
+
+#clean up the powers df by adding car ids and pivoting it longer for plotting
+powers1 = powers1 %>% 
+  rename('A'=1, 'B'=2, 'C'=3, 'D'=4) %>% 
+  pivot_longer(cols=everything(), names_to="car", values_to="power")
+
+#clean up the summary df a bit by adding car ids
+powers1_summary = powers1_summary %>% 
+  mutate(car = case_when(car==1~"A", car ==2~"B", car ==3~"C", car ==4~"D"))
+
+```
+
+# Use purrr::pmap() to calculate the car powers at various speeds and find the mean and max values
+```{r}
+#create a sample of various speeds whose average is 80 km/hr with stdev 10 km/hr out of a total of 200 samples
+mean_speed = 80 * 0.277
+nsample = 200
+#create normal distribution sample using the above definitions
+speeds = rnorm(mean=mean_speed, 
+                sd=0.125*mean_speed, 
+                nsample)
+summary(speeds)
+
+#######################################################################################################
+
+#compute car powers, mean, and max using purrr pmap
+#compute car powers for each car based on surface area, mass at range of speeds and clean up the df for plotting
+powers2 = pmap(list(A = cars_df$area, m=cars_df$mass),
+                    compute_car_power, 
+                    V=speeds) %>% 
+  data.frame %>% 
+  rename('A'=1, 'B'=2, 'C'=3, 'D'=4) %>% 
+  pivot_longer(cols=everything(), names_to="car", values_to="power")
+
+#compute mean and max power for each unique car and add to a new summary df 
+powers2_summary = powers2 %>% 
+  group_by(car) %>% 
+  summarize(mean = mean(power),
+            max = max(power))
+
+```
+
+# Plot the range of powers based on car type to compare the two methods
+```{r plot_3, out.width="100%", fig.align = 'center', fig.cap = "**Figure 1: Mean Power Consumption by Car Type.** Box and whisker plots of the mean power consumed by each car at an average speed of 80 km/hr with a standard deviation of 10 km/hr for a 200-sample normal distribution. Whiskers represent the 25th and 75th percentiles, dots represent outliers, and colors represent different car types. Values displayed in A) were generated via a for loop while values in B) were generated using the purrr::pmap() function."}
+#create plot of car powers based on method 1's data
+plot_1= ggplot(powers1, aes(car,power, fill=car))+
+  geom_boxplot(aes(middle = mean(power)))+
+  labs(x = "Car", y = "Power (Watts)", title = "Method 1: For Loop", fill = "Car ID")+
+  scale_fill_manual(values= wes_palette("Royal2", n = 4))+
+  theme_minimal()+ 
+  theme(legend.position = "none")
+
+#plot_1
+
+#create plot of car powers based on method 2's data
+plot_2 = ggplot(powers2, aes(car,power, fill=car))+
+  geom_boxplot(aes(middle = mean(power)))+
+  labs(x = "Car", y = "Power (Watts)", title = "Method 2: Purrr::pmap()", fill = "Car ID")+
+  scale_fill_manual(values= wes_palette("Royal2", n = 4))+
+  theme_minimal()+ 
+  theme(legend.position = "none")
+
+#plot_2 
+
+#brute force way to grab the legend I want for the combined cowplot below
+plot_legend = ggplot(powers2, aes(car,power, fill=car))+
+  geom_boxplot(aes(middle = mean(power)))+
+  labs(x = "Car", y = "Power (Watts)", title = "Method 2: Purrr::pmap()", fill = "Car ID")+
+  scale_fill_manual(values= wes_palette("Royal2", n = 4))+
+  theme_minimal()
+
+legend <- get_legend(plot_legend + theme(legend.box.margin = margin(0, 0, 0, 12)))
+
+#combine plots of both methods
+prow = plot_grid(plot_1, plot_2,
+          align = 'vh',
+          labels = c("A", "B"),
+          hjust = -2, 
+          vjust = 1.5)
+
+#add legend to plots
+plot_3 = plot_grid(prow, legend, rel_widths = c(3, .4))
+
+plot_3
+
+#alternative method to combine plots
+#ggarrange(plot_1, plot_2,  nrow=2)
+```
+
+
+
