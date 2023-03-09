@@ -1,0 +1,70 @@
+---
+title: "GROUP submission for Assignment 1b"
+author: "K.H.Art"
+date: "2023-02-22"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+### ESM 262 Assignment 1b - Wind Farm Model 
+#### Group a1bC
+Charlie Wilson, Tommy King, Kristin Art
+
+Link to Wind Farm Model Flowchart: https://drive.google.com/file/d/1R_DnVxNVxMHxP6Cs03nD7w1PyyaeVDV0/view?usp=sharing 
+
+##### Overall Program
+- **Inputs**: windmill height (m), windmill blade length (m), windmill age (yrs), average daily wind speed (m/s), number of windmills (n)
+
+- **Output**: wind farm profit per day ($/day)
+
+- **Parameters**: generator efficiency, gearbox bearing efficiency, ρ = Air density in kg/m3, $C_p$ = Coefficient of performance, market $/ Kwh
+
+- **Goal**: Calculate wind farm profit per day based on windmill attributes and daily average wind speed. Calculate wind farm profit by multiplying energy produced per day (Kwh) by market $/ Kwh. Energy produced per day is based on the equation to calculate windmill power (P), which is given by:
+$$
+P = 0.5 * ρ * A * C_p * V3 * N_g * N_b 
+$$
+where, 
+ρ = Air density in kg/m3, 
+A = Rotor swept area (m2),
+$C_p$ = Coefficient of performance,
+V = wind velocity (m/s),
+$N_g$ = generator efficiency, and
+$N_b$ = gear box bearing efficiency
+
+##### Module 1: Calculate windmill sweep area
+- **Input**: windmill height (m), windmill blade length (m)
+
+- **Output**: windmill sweep area (m^2)
+
+- **Parameters**:
+
+##### Module 2: Calculate windmill efficiency
+- **Input**: windmill age (yrs)
+
+- **Output**: windmill efficiency 
+
+- **Parameters**: generator efficiency, gearbox bearing efficiency, ρ = Air density in kg/m3
+
+##### Module 3: Calculate energy produced by single windmill
+- **Input**: average daily wind speed (m/s), windmill efficiency 
+
+- **Output**: energy output of single windmill (Kwh/ day)
+
+- **Parameters**: $C_p$ = Coefficient of performance
+
+##### Module 4: Calculate energy produced by whole farm
+- **Input**: number of windmills (n), energy output of single windmill (Kwh/ day)
+
+- **Output**: total daily energy produced (Kwh/ day)
+
+- **Parameters**: 
+
+##### Module 5: Calculate average wind farm profit per day
+- **Input**: total daily energy produced (Kwh/day)
+
+- **Output**: wind farm profit per day ($/day)
+
+- **Parameters**: market $/ Kwh

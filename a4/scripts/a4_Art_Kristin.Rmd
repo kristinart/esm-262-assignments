@@ -1,0 +1,52 @@
+---
+title: "a4_Art_Kristin"
+author: "K.H.Art"
+date: "2023-03-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(purrr)
+```
+
+#Load function 
+```{r}
+source("R/summarize_fish_catch.R")
+```
+
+#Load fish.txt data in and apply the above function
+```{r}
+fish_df <- read.delim2(here('a4/data/fish.txt'))
+
+#turn df into a vector for input into function
+fish <- fish_df[[1]]
+
+results = summarize_fish_catch(fish)
+results
+
+```
+
+#Generate multiple fish catches (code copied from Naomi Tague's lecture 6: Flow Control)
+```{r}
+# generate some data if we had 10 different fishing days
+possible.fish = c("salmon","steelhead","shark","tuna","cod")
+
+# lets generate random sample of the number of fish caught on each day
+ndays=10
+catches = round(runif(min=3, max=400, n=ndays))
+
+# now for each fishing day (and its number of fish caught) - use sample to genreate the fish
+catches_res = list(catches) %>% pmap(sample, x=possible.fish, replace=TRUE)
+
+# look at the sample catches
+catches_res[[1]]
+```
+
+#Adjust function to summarize multiple fish catches
+```{r}
+#....did not have time to attempt this, but would like to another time!
+```
+
